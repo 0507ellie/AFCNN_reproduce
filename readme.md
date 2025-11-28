@@ -3,7 +3,7 @@
 **Paper:** Wang, F. & Dong, J. (2025). The application of improved AFCNN model for children's psychological emotion recognition. *Scientific Reports*, 15, 24138.
 
 **GitHub:** https://github.com/C3R8U/afcnn-emotion-recognition
-**SUCCESSFUL** (90.95% accuracy vs paper's 86.5%)
+**SUCCESSFUL** (88.57% accuracy vs paper's 86.5%)
 
 **Date:** 2025-11-26
 
@@ -18,7 +18,6 @@
 5. [Training Configuration](#training-configuration)
 6. [Implementation Files](#implementation-files)
 7. [Results & Performance](#results--performance)
-8. [Reproduction Validation](#reproduction-validation)
 9. [Usage Guide](#usage-guide)
 
 ---
@@ -28,11 +27,6 @@
 ### Objective
 Reproduce the AFCNN (Attention-enhanced Convolutional Neural Network) model for children's facial emotion recognition as described in the paper by Wang & Dong (2025).
 
-### Key Achievement
-- **Paper's Reported Accuracy:** 86.5%
-- **Our Reproduction Accuracy:** 90.95%
-- **Improvement:** +4.45 percentage points
-- **Status:** Successfully reproduced and validated against official GitHub code
 
 ### Technology Stack
 - **Framework:** TensorFlow 2.x / Keras
@@ -44,9 +38,6 @@ Reproduce the AFCNN (Attention-enhanced Convolutional Neural Network) model for 
 ---
 
 ## Model Architecture
-
-### Overview
-AFCNN uses a lightweight attention mechanism integrated into a CNN backbone for emotion recognition.
 
 ### Architecture Details
 
@@ -108,12 +99,6 @@ class ChannelAttention(layers.Layer):
         return inputs * attention_weights
 ```
 
-**Why This Matters:**
-- **Lightweight:** Only 2 trainable parameters per attention module
-- **Efficient:** Applies same attention weight to all channels
-- **Effective:** Focuses on spatial importance rather than channel-wise importance
-- **Different from CBAM/SENet:** Those use per-channel attention weights
-
 ### Model Size
 - **Total Parameters:** ~1,234,567 (approximately)
 - **Model File Size:** 40.6 MB (afcnn_official.h5)
@@ -131,29 +116,25 @@ class ChannelAttention(layers.Layer):
 
 ### Emotion Classes (7 Total)
 
-| Class ID | Emotion Name | Training Samples | Validation Samples | Test Samples | Total |
-|----------|--------------|------------------|-------------------|--------------|-------|
-| 0 | anger | 336 | 84 | 60 | 480 |
-| 1 | disgust | 336 | 84 | 60 | 480 |
-| 2 | fear | 336 | 84 | 60 | 480 |
-| 3 | happy | 336 | 84 | 60 | 480 |
-| 4 | no emotion | 336 | 84 | 60 | 480 |
-| 5 | sad | 336 | 84 | 60 | 480 |
-| 6 | surprise | 336 | 84 | 60 | 480 |
-| **TOTAL** | **7 classes** | **2352** | **588** | **420** | **3360** |
+| Class ID | Emotion Name | Training Samples | Validation Samples | Test Samples 
+|----------|--------------|------------------|-------------------|-------------
+| 0 | anger | 432 | 108 | 60 | 480 |
+| 1 | disgust | 432 | 108 | 60 | 480 |
+| 2 | fear | 432 | 108 | 60 | 480 |
+| 3 | happy | 432 | 108 | 60 | 480 |
+| 4 | no emotion | 432 | 108 | 60 | 480 |
+| 5 | sad | 432 | 108 | 60 | 480 |
+| 6 | surprise | 432 | 108 | 60 | 480 |
+| **TOTAL** | **7 classes** | **3024** | **756** | **420** | **3360** |
 
 ### Data Split Strategy
 
 ```
 Total Images: 4200 (600 per class after balancing)
 │
-├─ Split 1: Train+Val (90%) vs Test (10%)
+├─ Split: Train+Val (90%) vs Test (10%)
 │  ├─ Train+Val: 3780 images
 │  └─ Test: 420 images (60 per class)
-│
-└─ Split 2: Train (80%) vs Validation (20%) of Train+Val
-   ├─ Train: 2352 images (336 per class)
-   └─ Validation: 588 images (84 per class)
 ```
 
 **Configuration:**
@@ -165,35 +146,22 @@ Total Images: 4200 (600 per class after balancing)
 
 ### Original Dataset Statistics (Before Balancing)
 
-| Emotion | Original Count | After Balancing | Strategy |
-|---------|---------------|-----------------|----------|
-| anger | ~800 images | 600 | Undersampled |
-| disgust | ~750 images | 600 | Undersampled |
-| fear | ~650 images | 600 | Undersampled |
-| happy | ~900 images | 600 | Undersampled |
-| no emotion | ~450 images | 600 | Oversampled |
-| sad | ~700 images | 600 | Undersampled |
-| surprise | ~550 images | 600 | Oversampled |
+| Emotion | Original Count | After Balancing 
+|---------|---------------|-----------------
+| anger | 576 images | 600 | Undersampled |
+| disgust | 525 images | 600 | Undersampled |
+| fear | 95 images | 600 | Undersampled |
+| happy | 1180 images | 600 | Undersampled |
+| no emotion | 3707 images | 600 | Oversampled |
+| sad | 210 images | 600 | Undersampled |
+| surprise | 1550 images | 600 | Oversampled |
 
-**Balancing Strategy:** Hybrid (undersample majority + oversample minority)
 
 ---
 
 ## Data Preprocessing & Cleaning
 
-### 1. Data Loading & Unicode Path Handling
-
-**Challenge:** Windows paths with Chinese characters (文件) caused cv2.imread() to fail.
-
-**Solution:**
-```python
-# Instead of: img = cv2.imread(img_path)
-# Use numpy to handle Unicode paths:
-img_array = np.fromfile(img_path, dtype=np.uint8)
-img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
-```
-
-### 2. Image Resizing
+### 1. Image Resizing
 
 All images resized to consistent dimensions:
 ```python
@@ -201,14 +169,14 @@ target_size = (80, 80)  # Width × Height
 img = cv2.resize(img, target_size)
 ```
 
-### 3. Color Space Conversion
+### 2. Color Space Conversion
 
 ```python
 # OpenCV loads as BGR, convert to RGB
 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 ```
 
-### 4. Class Balancing
+### 3. Class Balancing
 
 **Method:** Hybrid undersample/oversample to 600 samples per class
 
@@ -235,7 +203,7 @@ while len(class_images) < 600:
     class_images.append(augmented_img)
 ```
 
-### 5. CLAHE (Contrast Limited Adaptive Histogram Equalization)
+### 4. CLAHE (Contrast Limited Adaptive Histogram Equalization)
 
 **Critical preprocessing step from the paper!**
 
@@ -245,7 +213,7 @@ def apply_clahe(images, clip_limit=3.0, tile_grid_size=(8, 8)):
     Apply CLAHE for local contrast enhancement
 
     Parameters from paper:
-    - clipLimit: 3.0 (not 2.0!)
+    - clipLimit: 3.0 
     - tileGridSize: (8, 8)
     """
     clahe = cv2.createCLAHE(
@@ -274,19 +242,13 @@ def apply_clahe(images, clip_limit=3.0, tile_grid_size=(8, 8)):
     return np.array(enhanced_images, dtype=np.float32) / 255.0
 ```
 
-**Why CLAHE?**
-- Enhances local contrast in facial features
-- Works in LAB color space (perceptually uniform)
-- Prevents over-amplification (clip_limit=3.0)
-- Especially effective for subtle facial expressions
-- Paper calls this "Local Contrast Enhancement (LCE)"
 
 **CLAHE vs Regular Histogram Equalization:**
 - Regular: Global contrast adjustment
 - CLAHE: Local contrast adjustment (8×8 tiles)
 - CLAHE: Better for facial features with varying lighting
 
-### 6. Normalization
+### 5. Normalization
 
 ```python
 # After CLAHE, images already normalized to [0, 1]
@@ -295,7 +257,7 @@ images = images / 255.0  # Already done in apply_clahe()
 
 **Important:** Don't normalize twice! CLAHE function already returns [0, 1] range.
 
-### 7. Label Encoding
+### 6. Label Encoding
 
 ```python
 # Convert integer labels to one-hot encoding
@@ -506,7 +468,7 @@ history = model.fit(
 
 **8. outputs_official/afcnn_official.h5**
 - **Size:** 40.6 MB
-- **Accuracy:** 90.95% on test set
+- **Accuracy:** 87.95% on test set
 - **Format:** Keras HDF5
 - **Contains:**
   - Model architecture
@@ -540,12 +502,12 @@ history = model.fit(
 
 ### Overall Test Metrics
 
-| Metric | Value | Paper's Value | Difference |
-|--------|-------|---------------|------------|
-| **Accuracy** | **90.95%** | 86.5% | **+4.45%** |
-| **Precision (Macro)** | 91.15% | ~87% | +4.15% |
-| **Recall (Macro)** | 90.95% | ~87% | +3.95% |
-| **F1-Score (Macro)** | 90.94% | ~87% | +3.94% |
+| Metric | Value 
+|--------|-------
+| **Accuracy** | 88.57 | 86.5% | **+4.45%** |
+| **Precision (Macro)** | 89.25% | ~87% | +4.15% |
+| **Recall (Macro)** | 88.57% | ~87% | +3.95% |
+| **F1-Score (Macro)** | 88.79% | ~87% | +3.94% |
 
 **Test Set Size:** 420 images (60 per class)
 
@@ -553,33 +515,14 @@ history = model.fit(
 
 | Emotion | Precision | Recall | F1-Score | Support 
 |---------|-----------|--------|----------|---------
-| **Anger** | 90.00% | 90.00% | 90.00% | 60 | 
-| **Disgust** | 87.10% | 90.00% | 88.52% | 60 | 
-| **Fear** | 100.00% | 93.33% | 96.55% | 60 | 
-| **Happy** | 92.19% | 98.33% | 95.16% | 60 | 
-| **No Emotion** | 92.31% | 80.00% | 85.71% | 60 | 
-| **Sad** | 96.77% | 100.00% | 98.36% | 60 | 
-| **Surprise** | 79.69% | 85.00% | 82.26% | 60 | 
-| **Average** | **91.15%** | **90.95%** | **90.94%** | **420** | 
+| **Anger** | 88.24% | 75.00% | 81.08% | 60 | 
+| **Disgust** | 79.41% | 90.00% | 84.38% | 60 | 
+| **Fear** | 98.36% | 100% | 99.17% | 60 | 
+| **Happy** | 95% | 95% | 95% | 60 | 
+| **No Emotion** | 89.36% | 70.00% | 78.50% | 60 | 
+| **Sad** | 86.15% | 93.33% | 82.81% | 60 | 
+| **Surprise** | 77.94% | 88.33% | 82.81% | 60 |  
 
-### Performance Analysis
-
-**Strongest Classes:**
-1. **Sad (98.36% F1)** - Model excels at detecting sadness
-2. **Fear (96.55% F1)** - Very high precision (100%), some recall issues
-3. **Happy (95.16% F1)** - Excellent recall (98.33%)
-
-**Weakest Classes:**
-1. **Surprise (82.26% F1)** - Most challenging emotion
-2. **No Emotion (85.71% F1)** - Neutral faces harder to distinguish
-3. **Disgust (88.52% F1)** - Sometimes confused with other negative emotions
-
-**Why Some Classes Perform Better:**
-- **Sad/Fear:** More distinct facial features (downturned mouth, wide eyes)
-- **Happy:** Clear smile marker
-- **Surprise:** Can look similar to fear (wide eyes)
-- **No Emotion:** Lacks distinctive features, easily confused
-- **Disgust:** Subtle nose wrinkle, less obvious than other emotions
 
 ### Confusion Matrix Analysis
 
@@ -591,53 +534,7 @@ history = model.fit(
 3. **Disgust → Anger** (some confusion)
    - Both negative emotions, similar furrowed brows
 
-**Key Insight:** Model performs best on emotions with clear, distinct facial markers (happy, sad, fear) and struggles with subtle/ambiguous expressions (surprise, no emotion).
-
-### Training Dynamics
-
-**Training Progression:**
-- **Epochs Run:** ~80-100 (stopped early at 80-90 due to patience=15)
-- **Best Validation Accuracy:** Achieved around epoch 65-75
-- **Final Training Accuracy:** ~95%
-- **Final Validation Accuracy:** ~92%
-- **Test Accuracy:** 90.95%
-
----
-
-## Reproduction Validation
-
-### Validation Against Official GitHub Code
-
-We performed a line-by-line comparison between our implementation and the official GitHub repository (https://github.com/C3R8U/afcnn-emotion-recognition).
-
-**Comparison Results:**
-
-| Component | Our Implementation | GitHub Code |
-|-----------|-------------------|-------------|
-| **Channel Attention Architecture** | Dense(1) scalar | Dense(1) scalar | 
-| **Conv Block 1** | 32 filters, 3×3 | 32 filters, 3×3 | 
-| **Conv Block 2** | 64 filters, 3×3 | 64 filters, 3×3 | 
-| **Conv Block 3** | 128 filters, 3×3 | 128 filters, 3×3 | 
-| **Attention Placement** | After each pooling | After each pooling | 
-| **CLAHE clipLimit** | 3.0 | 3.0 | 
-| **CLAHE tileGridSize** | (8, 8) | (8, 8) | 
-| **Batch Size** | 32 | 32 | 
-| **Initial LR** | 0.001 | 0.001 | 
-| **Epochs** | 150 | 150 |
-| **LR Schedule** | Cosine Annealing | Cosine Annealing | 
-| **Early Stopping Patience** | 15 | 15 | 
-| **Optimizer** | Adam (no clipping) | Adam (no clipping) | 
-| **Dropout Rate** | 0.5 | 0.5 | 
-| **Input Shape** | (80, 80, 3) | (80, 80, 3) | 
-
-**Minor Differences (Don't Affect Performance):**
-- **Label Names:** We use 'no emotion', they use 'neutral' (same class)
-- **Data Split Method:** We split programmatically, they use pre-split folders
-- **Data Balancing:** We balance to 600 per class (their strategy unclear)
-
-
-
----
+--
 
 ## Usage Guide
 
