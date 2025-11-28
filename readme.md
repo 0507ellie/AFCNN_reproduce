@@ -381,11 +381,6 @@ history = model.fit(
 9. Restore best weights
 10. Evaluate on test set
 
-### Computational Requirements
-
-**Training Time:**
-- **GPU (NVIDIA RTX 3090):** ~30-45 
-
 ---
 
 ## Implementation Files
