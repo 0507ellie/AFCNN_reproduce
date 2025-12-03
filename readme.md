@@ -427,17 +427,15 @@ history = model.fit(
 - **Lines of Code:** ~250
 
 **5. test_model.py**
-- **Purpose:** Test on individual images or webcam
+- **Purpose:** Test on individual images 
 - **Features:**
   - Single image prediction
   - Batch prediction (folder)
-  - Real-time webcam inference
   - Visualization with probability bars
 - **Usage:**
   ```bash
   python test_model.py --image path/to/image.jpg
   python test_model.py --folder path/to/folder
-  python test_model.py --webcam
   ```
 
 **6. my_test.py**
@@ -544,9 +542,6 @@ python test_model.py --image "path/to/image.jpg"
 
 # 3. Test entire folder
 python test_model.py --folder "path/to/folder"
-
-# 4. Test with webcam (real-time)
-python test_model.py --webcam
 
 # 5. Run full evaluation on test set
 python evaluate_official.py
